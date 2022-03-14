@@ -1,3 +1,4 @@
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -33,11 +34,11 @@ public class GetAPage {
         }
         return hrefsSet;
     }
-    public static Set<String> getSiteMap (Set<String> set) {
+    @NotNull
+    public static Set<String> getSiteMap (@NotNull Set<String> set) {
         Set<String> resultSet = new HashSet<>(getSetHrefs(url));
         set.forEach(line ->
-                getSetHrefs(url + line).forEach(l ->
-                        resultSet.add(l)));
+                getSetHrefs(url + line).forEach(resultSet::add));
         return resultSet;
     }
 
