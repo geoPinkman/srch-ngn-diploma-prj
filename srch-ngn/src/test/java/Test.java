@@ -21,12 +21,9 @@ public class Test {
                     .referrer(referer)
                     .get();
 
-            Elements hrefs = doc.getAllElements();
+            Elements hrefs = doc.select("a[href^=/]");
             for (Element href : hrefs) {
-                if (!href.text().isEmpty()){
-                    hrefsSet.add(href.text());
-                }
-
+                System.out.println(href.attr("href"));
                 //System.out.println(href.attr("href"));
 //                String toCorrect = href.attr("href");
 //                if (toCorrect.length() > 1 & toCorrect.charAt(0) == '/') {

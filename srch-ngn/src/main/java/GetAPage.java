@@ -22,12 +22,10 @@ public class GetAPage {
                     .referrer(referer)
                     .get();
 
-            Elements hrefs = doc.select("a[href]");
+            Elements hrefs = doc.select("a[href^=/]");
             for (Element href : hrefs) {
                 String toCorrect = href.attr("href");
-                if (toCorrect.charAt(0) == '/' & toCorrect.length() > 1) {
-                    hrefsSet.add(toCorrect);
-                }
+                hrefsSet.add(toCorrect);
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -37,8 +35,7 @@ public class GetAPage {
     @NotNull
     public static Set<String> getSiteMap (@NotNull Set<String> set) {
         Set<String> resultSet = new HashSet<>(getSetHrefs(url));
-        set.forEach(line ->
-                getSetHrefs(url + line).forEach(resultSet::add));
+        set.forEach(line -> getSetHrefs(url + line).forEach(resultSet::add));
         return resultSet;
     }
 
