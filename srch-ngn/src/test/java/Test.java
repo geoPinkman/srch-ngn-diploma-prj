@@ -11,7 +11,7 @@ public class Test {
 
     public static String userAgent= "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.1 Safari/605.1.15";
     public static String referer = "https://www.google.com/";
-    public static String url = "https://www.lenta.ru";
+    public static String url = "https://www.svetlovka.ru/";
 
     public static Set<String> getSetHrefs (String url) {
         Set<String> hrefsSet = new HashSet<>();
@@ -21,17 +21,17 @@ public class Test {
                     .referrer(referer)
                     .get();
 
-            Elements hrefs = doc.select("a[href]");
+            Elements hrefs = doc.getAllElements();
             for (Element href : hrefs) {
-
-                //System.out.println(href.attr("href"));
-                String toCorrect = href.attr("href");
-                if (toCorrect.length() > 1 & toCorrect.charAt(0) == '/') {
-                    hrefsSet.add(toCorrect);
+                if (!href.text().isEmpty()){
+                    hrefsSet.add(href.text());
                 }
 
-
-
+                //System.out.println(href.attr("href"));
+//                String toCorrect = href.attr("href");
+//                if (toCorrect.length() > 1 & toCorrect.charAt(0) == '/') {
+//                    hrefsSet.add(toCorrect);
+//                }
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -42,8 +42,8 @@ public class Test {
 
     public static void main(String[] args) {
 
-        Set<String> test = getSetHrefs(url);
-        test.stream().sorted().forEach(System.out :: println);
+        getSetHrefs(url).forEach(System.out :: println);
+
 
     }
 }
