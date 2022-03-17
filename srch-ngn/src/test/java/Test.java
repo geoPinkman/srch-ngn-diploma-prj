@@ -1,39 +1,60 @@
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class Test {
 
     public static String userAgent= "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.1 Safari/605.1.15";
     public static String referer = "https://www.google.com/";
-    public static String url = "https://www.svetlovka.ru";
+    public static String url = "http://www.playback.ru/";
+    public static Set<String> hrefsSet = new TreeSet<>();
 
-    public static Set<String> getSetHrefs (String url) {
-        Set<String> hrefsSet = new HashSet<>();
+//    public static Set<String> getSetHrefs (String url) {
+//        try {
+//            Document doc = Jsoup.connect(url)
+//                    .userAgent(userAgent)
+//                    .referrer(referer)
+//                    .get();
+//            Elements hrefs = doc.select("a[href^=/]");
+//            for (Element href : hrefs) {
+//                String line = href.attr("href");
+//                hrefsSet.add(line);
+//            }
+//
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//        }
+//        String finalUrl = url;
+//        hrefsSet.forEach(l -> getSetHrefs(finalUrl + l));
+//        url = "";
+//        return hrefsSet;
+//
+//    }
 
+    public static void getContext(String href) {
         try {
-            Document doc = Jsoup.connect(url)
-                    .userAgent(userAgent)
-                    .referrer(referer)
-                    .get();
-            Elements hrefs = doc.select("a[href^=/]");
-            hrefs.forEach(line -> hrefsSet.add(line.attr("href")));
+            Connection.Response response = Jsoup.connect(url + href).userAgent(userAgent).referrer(referer).execute();
+            System.out.println(response.statusCode());
+            Elements test = response.parse().select("a[href^=/]");
 
-        } catch (IOException ex) {
+            test.forEach(line -> {
+                String text = line.attr("href");
+                if (!text.contains(".jpg") | !text.endsWith(".png")) {
+                    hrefsSet.add(line.attr("href"));
+                }
+
+            });
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return hrefsSet;
-
     }
 
     public static void main(String[] args) {
-
-        getSetHrefs(url).stream().sorted().forEach(System.out::println);
-
-
+        getContext("/catalog/1141.html/brand/0/sort/0/page/1");
+        hrefsSet.forEach(System.out::println);
     }
 }
