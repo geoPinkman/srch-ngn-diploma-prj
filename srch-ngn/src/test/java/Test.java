@@ -10,7 +10,7 @@ public class Test {
 
     public static String userAgent= "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.1 Safari/605.1.15";
     public static String referer = "https://www.google.com/";
-    public static String url = "http://www.playback.ru/";
+    public static String url = "https://www.svetlovka.ru";
     public static Set<String> hrefsSet = new TreeSet<>();
 
 //    public static Set<String> getSetHrefs (String url) {
@@ -43,7 +43,7 @@ public class Test {
 
             test.forEach(line -> {
                 String text = line.attr("href");
-                if (!text.contains(".jpg") | !text.endsWith(".png")) {
+                if (!text.matches("\\.jpg|\\.png|\\.PNG") | !text.endsWith(".png")) {
                     hrefsSet.add(line.attr("href"));
                 }
 
@@ -53,8 +53,15 @@ public class Test {
         }
     }
 
+    public void print(){
+
+    }
+
     public static void main(String[] args) {
-        getContext("/catalog/1141.html/brand/0/sort/0/page/1");
-        hrefsSet.forEach(System.out::println);
+        String text = "/upload/img_books/Книжный лабиринт для подростков (12-17 лет).pdf";
+        System.out.println(text.matches("/\\S(?:jpg|jpeg|png|pdf)$"));
+        System.out.println(text.matches(" "));
+//        getContext("/");
+//        hrefsSet.forEach(System.out::println);
     }
 }
