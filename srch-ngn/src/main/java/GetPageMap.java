@@ -1,6 +1,5 @@
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.util.*;
@@ -47,21 +46,25 @@ public class GetPageMap {
 
 
     public void getHrefsOfPage(String href) {
-
+        StringBuilder context = new StringBuilder();
         Set<String> buffer = new TreeSet<>();
+        int status = 0;
         try {
             Connection.Response response = Jsoup
                     .connect(url + href)
                     .userAgent(userAgent)
                     .referrer(referer)
                     .execute();
-            Elements hrefs = response.parse().select("a[href^=/]");
-            hrefs.forEach(line -> {
-                String text = line.attr("href");
-                if (!text.matches("/\\S+(?:jpg|jpeg|png|pdf|doc|PDF|xlsx|JPG|docx)$")) {
-                    buffer.add(text);
+            Elements page = response.parse().getAllElements();
+            status = response.statusCode();
+            page.forEach(line -> {
+                context.append(line);
+                String hrefsOfPage = line.select("a[href^=/]").attr("href");
+                if (!hrefsOfPage.matches("/\\S+(?:jpg|jpeg|png|pdf|doc|PDF|xlsx|JPG|docx|eps)$") & !hrefsOfPage.contains(" ")) {
+                    buffer.add(hrefsOfPage);
                 }
             });
+            usedHrefs.put(href, context.toString().replaceAll("\n", ""));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -75,38 +78,16 @@ public class GetPageMap {
             setHrefs.addAll(buffer);
             for (String hrefInBuffer : buffer) {
                 if (!usedHrefs.containsKey(hrefInBuffer)) {
-                    usedHrefs.put(hrefInBuffer, getContext(hrefInBuffer));
-                    //System.out.println(hrefInBuffer);
-                    //System.out.println(Thread.currentThread().getName());
-                    new TestFork(new GetPageMap(url), hrefInBuffer);
-                    System.out.println(Thread.currentThread());
-                    getHrefsOfPage(hrefInBuffer);
+                    DaoPage.list.add(new DaoPage(hrefInBuffer, status, context.toString()));
+                    new ForkJoinPool().invoke(new TestFork(this, hrefInBuffer));
+                    //getHrefsOfPage(hrefInBuffer);
                 }
             }
         }
-        //return usedHrefs;
-    }
-
-    public String getContext(String href) {
-        StringBuilder context = new StringBuilder();
-        try {
-            Document doc = Jsoup.connect(url + href).userAgent(userAgent).referrer(referer).get();
-            Elements page = doc.getAllElements();
-            page.forEach(context::append);
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return context.toString().replaceAll("\n", "");
-    }
-
-    public void print() {
-        getUsedHrefs().keySet().forEach(System.out::println);
     }
 
     public static void main(String[] args) {
-        GetPageMap test = new GetPageMap("https://www.svetlovka.ru");
-        test.getHrefsOfPage("/");
-        test.print();
+        GetPageMap pageMap = new GetPageMap("https://www.svetlovka.ru");
+        pageMap.getHrefsOfPage("/");
     }
 }

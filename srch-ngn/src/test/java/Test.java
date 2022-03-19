@@ -59,8 +59,9 @@ public class Test {
 
     public static void main(String[] args) {
         String text = "/upload/img_books/Книжный лабиринт для подростков (12-17 лет).pdf";
-        System.out.println(text.matches("/\\S(?:jpg|jpeg|png|pdf)$"));
-        System.out.println(text.matches(" "));
+        String text1 = "/www.svetlovka.ru/upload/img_books/%D0%9A%D0%BD%D0%B8%D0%B6%D0%BD%D1%8B%D0%B9%20%D0%BB%D0%B0%D0%B1%D0%B8%D1%80%D0%B8%D0%BD%D1%82%20%D0%B4%D0%BB%D1%8F%20%D0%B4%D0%B5%D1%82%D0%B5%D0%B9%20(6-11%20%D0%BB%D0%B5%D1%82).pdf";
+        System.out.println(text.matches("\\S(?:jpg|jpeg|png|pdf)$") | text.contains(" "));
+        System.out.println(text1.contains("%"));
 //        getContext("/");
 //        hrefsSet.forEach(System.out::println);
     }
