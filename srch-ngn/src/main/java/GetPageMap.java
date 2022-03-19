@@ -78,7 +78,8 @@ public class GetPageMap {
             setHrefs.addAll(buffer);
             for (String hrefInBuffer : buffer) {
                 if (!usedHrefs.containsKey(hrefInBuffer)) {
-                    DaoPage.list.add(new DaoPage(hrefInBuffer, status, context.toString()));
+                    //DaoPage.list.add(new DaoPage(hrefInBuffer, status, context.toString()));
+                    System.out.println(hrefInBuffer);
                     new ForkJoinPool().invoke(new TestFork(this, hrefInBuffer));
                     //getHrefsOfPage(hrefInBuffer);
                 }

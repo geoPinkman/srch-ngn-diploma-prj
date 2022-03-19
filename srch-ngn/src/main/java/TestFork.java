@@ -12,11 +12,10 @@ public class TestFork extends RecursiveAction {
 
     @Override
     protected void compute() {
-        System.out.println(Thread.currentThread().getName());
+        //System.out.println(Thread.currentThread().getName());
         TestFork task = new TestFork(pageMap, href);
         task.fork();
-        pageMap.getHrefsOfPage(href);
-
+        task.pageMap.getHrefsOfPage(href);
 
     }
 
