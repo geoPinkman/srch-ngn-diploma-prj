@@ -1,8 +1,10 @@
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.helper.HttpConnection;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -35,34 +37,29 @@ public class Test {
 //
 //    }
 
-    public static void getContext(String href) {
+    public static Set<String> getContext(String href) {
+        Set<String> qq = new TreeSet<>();
         try {
-            Connection.Response response = Jsoup.connect(url + href).userAgent(userAgent).referrer(referer).execute();
+            Connection.Response response = Jsoup.connect(href).userAgent(userAgent).referrer(referer).execute();
             System.out.println(response.statusCode());
-            Elements test = response.parse().select("a[href^=/]");
+            Elements test = response.parse().select("div > a[href^=/]");
 
             test.forEach(line -> {
-                String text = line.attr("href");
-                if (!text.matches("\\.jpg|\\.png|\\.PNG") | !text.endsWith(".png")) {
-                    hrefsSet.add(line.attr("href"));
-                }
-
+                String text = line.attr("abs:href");
+                qq.add(text);
             });
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        return qq;
     }
 
     public void print(){
 
     }
 
-    public static void main(String[] args) {
-        String text = "/upload/img_books/Книжный лабиринт для подростков (12-17 лет).pdf";
-        String text1 = "/www.svetlovka.ru/upload/img_books/%D0%9A%D0%BD%D0%B8%D0%B6%D0%BD%D1%8B%D0%B9%20%D0%BB%D0%B0%D0%B1%D0%B8%D1%80%D0%B8%D0%BD%D1%82%20%D0%B4%D0%BB%D1%8F%20%D0%B4%D0%B5%D1%82%D0%B5%D0%B9%20(6-11%20%D0%BB%D0%B5%D1%82).pdf";
-        System.out.println(text.matches("\\S(?:jpg|jpeg|png|pdf)$") | text.contains(" "));
-        System.out.println(text1.contains("%"));
-//        getContext("/");
-//        hrefsSet.forEach(System.out::println);
+    public static void main(String[] args) throws IOException {
+
+        getContext(url).forEach(System.out::println);
     }
 }

@@ -7,17 +7,39 @@ import org.jsoup.select.Elements;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ForkJoinPool;
 
 public class Page {
 
-    public static Set<String> fullSet = new HashSet<>();
+    private static final String userAgent = "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.1 Safari/605.1.15";
+    private static final String referer = "https://www.google.com/";
 
-    //public static String url = "";
-    public static String userAgent = "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.1 Safari/605.1.15";
-    public static String referer = "https://www.google.com/";
+    private Set<String> fullSet;
+    private String url;
 
-    public static Set<String> getHrefsOnPage(String url) {
-        Set<String> hrefSet = new TreeSet<>();
+    public Page(String url) {
+        this.fullSet = new TreeSet<>();
+        this.url = url;
+    }
+
+    public Set<String> getFullSet() {
+        return fullSet;
+    }
+
+    public void setFullSet(Set<String> fullSet) {
+        this.fullSet = fullSet;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public Set<String> getHrefsOnPage(String url) {
+        Set<String> hrefSet = new HashSet<>();
         try {
             Connection.Response response = Jsoup
                     .connect(url)
@@ -35,19 +57,17 @@ public class Page {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        //fullSet.addAll(hrefSet);
+        if (fullSet.isEmpty()) {
+            fullSet.addAll(hrefSet);
+        }
         return hrefSet;
     }
 
-    public static Set<Set<String>> getHrefsOfHrefs(Set<String> hrefsSet) {
-        Set<Set<String>> setOfEachHref = new HashSet<>();
-        for (String href : hrefsSet) {
-                setOfEachHref.add(getHrefsOnPage(href));
-        }
-        return setOfEachHref;
+    public Set<Set<String>> getHrefsOfHrefs(Set<String> hrefsSet) {
+        return new ForkJoinPool(2).invoke(new NewTask(this, hrefsSet));
     }
 
-    public static void findNewHrefs(Set<Set<String>> setsOfSet) {
+    public void findNewHrefs(Set<Set<String>> setsOfSet) {
         Set<Set<String>> setOfBuffers = new HashSet<>(setsOfSet);
         Set<String> newHrefs = new HashSet<>();
         for (Set<String> hrefsSet : setOfBuffers) {
@@ -60,16 +80,9 @@ public class Page {
             newHrefs.addAll(hrefsSet);
             fullSet.addAll(newHrefs);
         }
-        newHrefs.forEach(System.out::println);
         if (!newHrefs.isEmpty()) {
             findNewHrefs(getHrefsOfHrefs(newHrefs));
         }
     }
-
-    public static void main(String[] args) {
-        fullSet.addAll(getHrefsOnPage("https://www.svetlovka.ru"));
-        findNewHrefs(getHrefsOfHrefs(fullSet));
-        //fullSet.forEach(System.out::println);
-        System.out.println(fullSet.size());
-    }
+    
 }
