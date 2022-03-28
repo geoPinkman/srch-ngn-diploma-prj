@@ -84,5 +84,5 @@ public class Page {
             findNewHrefs(getHrefsOfHrefs(newHrefs));
         }
     }
-    
+
 }
