@@ -8,7 +8,7 @@ public class DaoPage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Type(type = "org.hibernate.type.TextType")
+    //@Type(type = "org.hibernate.type.TextType")
     private String path;
 
     private int code;

@@ -45,7 +45,7 @@ public class Page {
 
     public Set<String> getHrefsOnPage(String url) {
         Set<String> hrefSet = new HashSet<>();
-        Document doc = null;
+        Document doc;
         try {
             Connection.Response response = Jsoup
                     .connect(url)
@@ -54,6 +54,10 @@ public class Page {
                     .execute();
             doc = response.parse();
             Elements elements = doc.select("a[href^=/]");
+            int statusCode = response.statusCode();
+
+            addToBase(url, statusCode, doc);
+
             for (Element href : elements) {
                 String trueHref = href.attr("abs:href");
                 if (!trueHref.matches("\\S+(?:jpg|jpeg|png|pdf|doc|PDF|xlsx|JPG|docx|eps)$") & !trueHref.contains(" ")) {
@@ -65,17 +69,15 @@ public class Page {
         }
         if (fullSet.isEmpty()) {
             fullSet.addAll(hrefSet);
-            Document finalDoc = doc;
-            hrefSet.stream().sorted().forEach(line -> getContent(line, finalDoc));
         }
         return hrefSet;
     }
 
-    public void getContent(String path, Document document) {
+    public void addToBase(String path, int statusCode, Document document) {
         StringBuilder content = new StringBuilder();
         try {
             content.append(document.outerHtml());
-            connector.makeTransaction(path, 200, content.toString());
+            connector.makeTransaction(path, statusCode, content.toString());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -105,6 +107,8 @@ public class Page {
 
     public static void main(String[] args) {
         Page page = new Page("https://www.svetlovka.ru/");
-        page.getHrefsOnPage(page.getUrl());
+        Set<String> mainPage = page.getHrefsOnPage(page.getUrl());
+        var test = page.getHrefsOfHrefs(mainPage);
+        page.findNewHrefs(test);
     }
 }

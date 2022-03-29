@@ -23,14 +23,13 @@ public class Connector {
         daoPage.setPath(path);
         daoPage.setCode(code);
         daoPage.setContent(content);
-        ss.save(daoPage);
-        tx.commit();
+        try {
+            ss.saveOrUpdate(daoPage);
+            tx.commit();
+        } catch (Exception q) {
+            q.printStackTrace();
+        }
         ss.close();
-    }
-
-    public static void main(String[] args) {
-        Connector connector = new Connector();
-        connector.makeTransaction("https://google.com", 200, "some content");
     }
 
 }
