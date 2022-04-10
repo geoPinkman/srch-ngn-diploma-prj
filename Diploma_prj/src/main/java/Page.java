@@ -56,7 +56,7 @@ public class Page {
             Elements elements = doc.select("a[href^=/]");
             int statusCode = response.statusCode();
 
-            //addToBase(url, statusCode, doc);
+            addToBase(url, statusCode, doc);
 
             for (Element href : elements) {
                 String trueHref = href.attr("abs:href");
@@ -65,6 +65,7 @@ public class Page {
                 }
             }
         } catch (Exception exception) {
+
             exception.printStackTrace();
         }
         if (fullSet.isEmpty()) {
@@ -108,8 +109,8 @@ public class Page {
     public static void main(String[] args) {
         Page page = new Page("https://www.svetlovka.ru/");
         Set<String> mainPage = page.getHrefsOnPage(page.getUrl());
-        mainPage.stream().sorted().forEach(System.out::println);
-//        var test = page.getHrefsOfHrefs(mainPage);
-//        page.findNewHrefs(test);
+        //mainPage.stream().sorted().forEach(System.out::println);
+        var test = page.getHrefsOfHrefs(mainPage);
+        page.findNewHrefs(test);
     }
 }

@@ -6,12 +6,12 @@ import org.apache.lucene.morphology.russian.RussianLuceneMorphology;
 
 
 public class Morph {
-    public static void main(String[] args) {
-        String test = "Повторное появление леопарда в Осетии позволяет предположить, что леопард постоянно обитает в некоторых районах Северного Кавказа.";
-        List<String> testList = getCorrectRussianText(test);//.forEach(System.out::println);
-        getMorphInfo(testList).forEach(System.out::println);
-        getMorphMap(test).forEach((l,p) -> System.out.println(l + " - " + p));
-    }
+//    public static void main(String[] args) {
+//        String test = "Повторное появление леопарда в Осетии позволяет предположить, что леопард постоянно обитает в некоторых районах Северного Кавказа.";
+//        List<String> testList = getCorrectRussianText(test);//.forEach(System.out::println);
+//        getMorphInfo(testList).forEach(System.out::println);
+//        getMorphMap(test).forEach((l,p) -> System.out.println(l + " - " + p));
+//    }
     private static List<String> getCorrectRussianText(String text) {
         String[] arrText = text.split(" |\\.");
         List<String> result = new ArrayList<>();
