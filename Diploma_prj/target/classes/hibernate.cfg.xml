@@ -18,5 +18,8 @@
         <!--  Drop and re-create the database schema on startup  -->
         <property name="hbm2ddl.auto">validate</property>
         <mapping class="DaoPage"/>
+        <mapping class="DaoField"/>
+        <mapping class="DaoLemma"/>
+        <mapping class="DaoIndex"/>
     </session-factory>
 </hibernate-configuration>

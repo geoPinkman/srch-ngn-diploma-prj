@@ -1,13 +1,15 @@
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
+@Table(name = "field")
 public class DaoField {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String name;
-    private String status;
+    private String selector;
     private float weight;
 
     public DaoField() {}
@@ -28,12 +30,12 @@ public class DaoField {
         this.name = name;
     }
 
-    public String getStatus() {
-        return status;
+    public String getSelector() {
+        return selector;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setSelector(String selector) {
+        this.selector = selector;
     }
 
     public float getWeight() {
@@ -42,5 +44,15 @@ public class DaoField {
 
     public void setWeight(float weight) {
         this.weight = weight;
+    }
+
+    @Override
+    public String toString() {
+        return "DaoField{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", selector='" + selector + '\'' +
+                ", weight=" + weight +
+                '}';
     }
 }

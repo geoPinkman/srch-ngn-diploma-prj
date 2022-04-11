@@ -6,9 +6,8 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import javax.persistence.criteria.CriteriaBuilder;
+import java.util.*;
 
 public class Connector {
 
@@ -48,17 +47,41 @@ public class Connector {
         return daoPageSet;
     }
 
+    public void addFields(String name, String selector, float weight) {
+        Session localSession = getSession();
+        Transaction tx = localSession.beginTransaction();
+        DaoField field = new DaoField();
+        field.setName(name);
+        field.setSelector(selector);
+        field.setWeight(weight);
+        localSession.save(field);
+        tx.commit();
+        localSession.close();
+    }
+    public Map<String, Float> getSelectorFields() {
+        Map<String, Float> fieldsMap = new HashMap<>();
+        List<DaoField> fields = session.createQuery("from DaoField ").getResultList();
+        for(DaoField field : fields) {
+            fieldsMap.put(field.getSelector(), field.getWeight());
+        }
+        return fieldsMap;
+    }
+
+    public void closeSession() {
+        session.close();
+        System.out.println("Session closed");
+    }
     public static void main(String[] args) {
         Connector connector = new Connector();
         connector.getSession();
-        //System.out.println(connector.getAllPaths().size());
-        //System.out.println(connector.getContent("https://www.svetlovka.ru/what-see/vr-360/"));
-        String head = Index.getCSSString(connector.getContent("https://www.svetlovka.ru/"), "head");
-        String body = Index.getCSSString(connector.getContent("https://www.svetlovka.ru/"), "body");
-//        Morph.getMorphMap(head).forEach((l,p) -> System.out.println(l + " - " + p));
-//        System.out.println("***");
-//        Morph.getMorphMap(body).forEach((l,p) -> System.out.println(l + " - " + p));
-        Index.getRankMap(body,0.8f).forEach((l,p) -> System.out.println(l + " - " + p));
+        Map<String, Float> fieldsMap = connector.getSelectorFields();
+        List<String> paths = connector.getAllPaths();
 
+
+        for (String path : paths) {
+            //System.out.println(Index.getCSSString(connector.getContent(path), "head"));
+            Index.getRankMap(Index.getCSSString(connector.getContent(path), "body"), 0.8f).forEach((l,p) -> System.out.println(l + " - " + p));
+        }
+        connector.closeSession();
     }
 }

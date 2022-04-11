@@ -1,7 +1,11 @@
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+
 @Entity
 @Table(name = "page")
 public class DaoPage {
@@ -15,6 +19,8 @@ public class DaoPage {
 
     @Type(type = "org.hibernate.type.TextType")
     private String content;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "page", cascade = CascadeType.ALL)
+    private List<DaoIndex> indexes = new ArrayList<>();
 
     public DaoPage(String path, int code, String content) {
         this.path = path;
@@ -23,6 +29,10 @@ public class DaoPage {
     }
 
     public DaoPage() {
+    }
+
+    public List<DaoIndex> getIndexes() {
+        return indexes;
     }
 
     public int getId() {
@@ -64,19 +74,7 @@ public class DaoPage {
                 ", path='" + path + '\'' +
                 ", code=" + code +
                 ", content='" + content + '\'' +
+                ", indexes=" + indexes +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DaoPage daoPage = (DaoPage) o;
-        return id == daoPage.id && code == daoPage.code && Objects.equals(path, daoPage.path) && Objects.equals(content, daoPage.content);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, path, code, content);
     }
 }
