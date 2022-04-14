@@ -7,42 +7,26 @@ import org.apache.lucene.morphology.russian.RussianLuceneMorphology;
 
 public class Morph {
 //    public static void main(String[] args) {
-//        String test = "Повторное появление леопарда в Осетии позволяет предположить, что леопард постоянно обитает в некоторых районах Северного Кавказа.";
+//        String test = "как бы-тур И. К. Лол";
 //        List<String> testList = getCorrectRussianText(test);//.forEach(System.out::println);
+//        testList.forEach(System.out::println);
 //        getMorphInfo(testList).forEach(System.out::println);
 //        getMorphMap(test).forEach((l,p) -> System.out.println(l + " - " + p));
 //    }
     private static List<String> getCorrectRussianText(String text) {
-        String[] arrText = text.split(" |\\.");
+        String[] arrText = text.split(" ");
         List<String> result = new ArrayList<>();
         for(String element : arrText) {
-            String corrEl = element.toLowerCase().replaceAll("[a-z0-9]", "");
-            corrEl = getWord(corrEl).trim();
-            if (!(corrEl.isEmpty()) & corrEl.trim().length() > 1) {
+            String corrEl = element.toLowerCase().replaceAll("[^а-я]", " ");
+
+            if (corrEl.contains(" ")) {
+                String[] word = corrEl.split(" ");
+                for (String wordPart : word) {
+                    result.add(wordPart.trim());
+                }
+            } else if (!(corrEl.isEmpty())){
                 result.add(corrEl.trim());
             }
-        }
-        return result;
-    }
-    private static String getWord(String word) {
-        String result = "";
-        String[] wordAsArr = word.split("");
-        for (int i = 0; i < wordAsArr.length; i++) {
-            if (wordAsArr[i].matches("[^а-я]")) {
-                wordAsArr[i] = "";
-            } else {
-                break;
-            }
-        }
-        for (int i = wordAsArr.length - 1; i > 0; i--) {
-            if (wordAsArr[i].matches("[^а-я]")) {
-                wordAsArr[i] = "";
-            } else {
-                break;
-            }
-        }
-        for(String letter : wordAsArr) {
-            result += letter;
         }
         return result;
     }

@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.RecursiveTask;
 
-public class NewTask extends RecursiveTask<Set<Set<String>>> {
-    private static final int THRESHOLD = 100;
+public class NewTask extends RecursiveTask<Set<String>> {
+    private static final int THRESHOLD = 200;
     Page page;
     Set<String> hrefsList;
 
@@ -15,8 +15,8 @@ public class NewTask extends RecursiveTask<Set<Set<String>>> {
     }
 
     @Override
-    protected Set<Set<String>> compute() {
-        Set<Set<String>> result = new HashSet<>();
+    protected Set<String> compute() {
+        Set<String> result = new HashSet<>();
 
         Set<String> first = new HashSet<>();
         Set<String> second = new HashSet<>();
@@ -35,20 +35,25 @@ public class NewTask extends RecursiveTask<Set<Set<String>>> {
             for (int i = 0; i < secondLength; i++) {
                 second.add(stringList.remove(0));
             }
-            NewTask task1 = new NewTask(page, first);
-            task1.fork();
-            NewTask task2 = new NewTask(page, second);
-            task2.fork();
 
-            result.addAll(task2.join());
-            result.addAll(task1.join());
+            List<NewTask> taskList = new LinkedList<>();
+            NewTask task1 = new NewTask(page, first);
+            taskList.add(task1);
+            NewTask task2 = new NewTask(page, second);
+            taskList.add(task2);
+            for (NewTask task : taskList) {
+                task.fork();
+            }
+            for (NewTask task : taskList) {
+                result.addAll(task.join());
+            }
         }
         return result;
     }
-    public Set<Set<String>> getHrefsOfHrefs(Set<String> hrefs) {
-        Set<Set<String>> setOfEachHref = new HashSet<>();
+    public Set<String> getHrefsOfHrefs(Set<String> hrefs) {
+        Set<String> setOfEachHref = new HashSet<>();
         for (String href : hrefs) {
-            setOfEachHref.add(page.getHrefsOnPage(href));
+            page.getHrefsOnPage(href).forEach(line -> setOfEachHref.add(line));
         }
         return setOfEachHref;
     }

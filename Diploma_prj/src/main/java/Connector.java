@@ -20,16 +20,17 @@ public class Connector {
         this.session = sessionFactory.openSession();
         return session;
     }
-    public void makeTransaction(String path, int code, String content) {
-        Transaction tx = session.beginTransaction();
+    public void makeTransactionInPageTable(String path, int code, String content) {
+        getSession();
+        //Transaction tx = session.beginTransaction();
         DaoPage daoPage = new DaoPage();
         daoPage.setPath(path);
         daoPage.setCode(code);
         daoPage.setContent(content);
-        List<DaoPage> list = session.createQuery("from DaoPage where path = :path").setParameter("path", path).getResultList();
+        List list = session.createQuery("from DaoPage where path = :path").setParameter("path", path).list();
         if (list.isEmpty()) {
             session.saveOrUpdate(daoPage);
-            tx.commit();
+            //tx.commit();
         }
         session.close();
     }
