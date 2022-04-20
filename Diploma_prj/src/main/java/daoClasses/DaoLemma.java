@@ -1,3 +1,5 @@
+package daoClasses;
+
 import javax.persistence.*;
 import java.util.*;
 
@@ -7,7 +9,6 @@ public class DaoLemma {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
     private String lemma;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "lemma", cascade = CascadeType.ALL)

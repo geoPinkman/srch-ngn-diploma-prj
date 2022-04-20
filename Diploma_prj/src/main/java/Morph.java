@@ -18,7 +18,6 @@ public class Morph {
         List<String> result = new ArrayList<>();
         for(String element : arrText) {
             String corrEl = element.toLowerCase().replaceAll("[^а-я]", " ");
-
             if (corrEl.contains(" ")) {
                 String[] word = corrEl.split(" ");
                 for (String wordPart : word) {
@@ -31,14 +30,16 @@ public class Morph {
         return result;
     }
 
-    private static List<List<String>> getMorphInfo(List<String> list){
+    private static List<List<String>> getMorphInfo(List<String> list) {
         List<List<String>> allInfo = new ArrayList<>();
         try {
             LuceneMorphology luceneMorph = new RussianLuceneMorphology();
             List<String> result = new ArrayList<>(list);
             for (String word : result) {
-                List<String> morphList = luceneMorph.getMorphInfo(word);
-                allInfo.add(morphList);
+                if (!word.isEmpty() & !word.isBlank()) {
+                    List<String> morphList = luceneMorph.getMorphInfo(word);
+                    allInfo.add(morphList);
+                }
             }
         } catch (IOException ex) {
             ex.printStackTrace();

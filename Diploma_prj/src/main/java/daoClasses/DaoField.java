@@ -1,3 +1,5 @@
+package daoClasses;
+
 import javax.persistence.*;
 
 @Entity
@@ -7,7 +9,6 @@ public class DaoField {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
     private String name;
     private String selector;
     private float weight;
