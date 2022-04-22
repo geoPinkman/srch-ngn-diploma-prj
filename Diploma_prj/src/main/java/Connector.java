@@ -21,7 +21,6 @@ public class Connector {
 
 
     public void addPage(Page page) {
-        //Transaction tx = session.beginTransaction();
         Page daoPage = new Page();
         daoPage.setPath(page.getPath());
         daoPage.setCode(page.getCode());
@@ -30,7 +29,6 @@ public class Connector {
         if (list.isEmpty()) {
             session.saveOrUpdate(daoPage);
         }
-        //tx.commit();
     }
 
     public void saveLemma(String lemma) {
@@ -52,7 +50,6 @@ public class Connector {
             daoLemma.setLemma(lemma);
             session.save(daoLemma);
         }
-
     }
 
     public Lemma getLemma(String lemma) {

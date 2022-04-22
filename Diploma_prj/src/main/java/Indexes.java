@@ -92,12 +92,12 @@ public class Indexes {
     }
 
     private static Map<String, Float> getRank(String text, float weight) {
-        Map<String, Float> wr = new Hashtable<>();
+        Map<String, Float> resultRankMap = new Hashtable<>();
         Map<String, Integer> tempMap = getMorphMap(text);
         for(var line : tempMap.entrySet()) {
-            wr.put(line.getKey(), line.getValue() * weight);
+            resultRankMap.put(line.getKey(), line.getValue() * weight);
         }
-        return wr;
+        return resultRankMap;
     }
 
     public static Map<String, Float> rankMap(String content, Map<String, Float> indexes) {
