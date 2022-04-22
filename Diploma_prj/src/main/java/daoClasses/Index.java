@@ -5,23 +5,23 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "indeex")
-public class DaoIndex {
+public class Index {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ManyToOne()
     @JoinColumn(name = "page_id", referencedColumnName = "id")
-    private DaoPage page;
+    private Page page;
 
     @ManyToOne()
     @JoinColumn(name = "lemma_id", referencedColumnName = "id")
-    private DaoLemma lemma;
+    private Lemma lemma;
 
     @Column(name = "raank")
     float rank;
 
-    public DaoIndex() {
+    public Index() {
     }
 
     public int getId() {
@@ -32,19 +32,19 @@ public class DaoIndex {
         this.id = id;
     }
 
-    public DaoPage getPage() {
+    public Page getPage() {
         return page;
     }
 
-    public void setPage(DaoPage page) {
+    public void setPage(Page page) {
         this.page = page;
     }
 
-    public DaoLemma getLemma() {
+    public Lemma getLemma() {
         return lemma;
     }
 
-    public void setLemma(DaoLemma lemma) {
+    public void setLemma(Lemma lemma) {
         this.lemma = lemma;
     }
 
@@ -61,8 +61,8 @@ public class DaoIndex {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        DaoIndex daoIndex = (DaoIndex) o;
-        return id == daoIndex.id && Float.compare(daoIndex.rank, rank) == 0 && Objects.equals(page, daoIndex.page) && Objects.equals(lemma, daoIndex.lemma);
+        Index index = (Index) o;
+        return id == index.id && Float.compare(index.rank, rank) == 0 && Objects.equals(page, index.page) && Objects.equals(lemma, index.lemma);
     }
 
     @Override

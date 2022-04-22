@@ -1,3 +1,5 @@
+import daoClasses.Page;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -12,7 +14,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ForkJoinPool;
 
-public class Page {
+public class Parser {
 
     private static final String userAgent = "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.1 Safari/605.1.15";
     private static final String referer = "https://www.google.com/";
@@ -20,7 +22,7 @@ public class Page {
     private Set<String> fullSet;
     private String url;
 
-    public Page(String url) {
+    public Parser(String url) {
         this.fullSet = new TreeSet<>();
         this.url = url;
     }
@@ -96,23 +98,44 @@ public class Page {
         }
     }
 
-    public static void main(String[] args) {
-        Page page = new Page("https://www.svetlovka.ru/");
-        Set<String> stringSet = new HashSet<>();
+    public static Page getPage(String path) {
+        Page daoPage = new Page();
         try {
-            FileReader fileReader = new FileReader("hrefs.txt");
-            Scanner sc = new Scanner(fileReader);
-            while (sc.hasNextLine()) {
-                stringSet.add(sc.nextLine());
-            }
-            fileReader.close();
-        } catch (IOException e) {
+            Connection.Response response = Jsoup
+                    .connect(path)
+                    .userAgent(userAgent)
+                    .referrer(referer)
+                    .execute();
+            Elements page = response.parse().getAllElements();
+            int statusCode = response.statusCode();
+            String content = page.html();
+            daoPage.setPath(path);
+            daoPage.setCode(statusCode);
+            daoPage.setContent(content);
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        if (stringSet.isEmpty()) {
-            stringSet.add(page.getUrl());
-        }
-        page.fullSet.addAll(stringSet);
-        page.findNewHrefs(page.getHrefsOfHrefs(page.getHrefsOnPage(page.getUrl())));
+        return daoPage;
     }
+
+//    public static void main(String[] args) {
+//        Parser parser = new Parser("https://www.svetlovka.ru/");
+//        Set<String> stringSet = new HashSet<>();
+//        try {
+//            FileReader fileReader = new FileReader("hrefs.txt");
+//            Scanner sc = new Scanner(fileReader);
+//            while (sc.hasNextLine()) {
+//                stringSet.add(sc.nextLine());
+//            }
+//            fileReader.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        if (stringSet.isEmpty()) {
+//            stringSet.add(parser.getUrl());
+//        }
+//        parser.fullSet.addAll(stringSet);
+//        parser.findNewHrefs(parser.getHrefsOfHrefs(parser.getHrefsOnPage(parser.getUrl())));
+//    }
 }

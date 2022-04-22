@@ -5,42 +5,40 @@ import java.util.Set;
 import java.util.concurrent.RecursiveTask;
 
 public class NewTask extends RecursiveTask<Set<String>> {
-    private static final int THRESHOLD = 200;
-    Page page;
+    private static final int THRESHOLD = 100;
+    Parser parser;
     Set<String> hrefsList;
 
-    public NewTask(Page page, Set<String> hrefsList) {
-        this.page = page;
+    public NewTask(Parser parser, Set<String> hrefsList) {
+        this.parser = parser;
         this.hrefsList = hrefsList;
     }
 
     @Override
     protected Set<String> compute() {
         Set<String> result = new HashSet<>();
-
-        Set<String> first = new HashSet<>();
-        Set<String> second = new HashSet<>();
-        List<String> stringList = new LinkedList<>(hrefsList);
-
         if (hrefsList.size() <= THRESHOLD) {
             result = getHrefsOfHrefs(hrefsList);
-        }
-        else {
-            int firstLength = hrefsList.size() / 2;
-            int secondLength = hrefsList.size() - firstLength;
-
-            for (int i = 0; i < firstLength; i++) {
-                first.add(stringList.remove(0));
-            }
-            for (int i = 0; i < secondLength; i++) {
-                second.add(stringList.remove(0));
-            }
-
+        } else {
+            Set<String> stringSetSmallerSize = new HashSet<>();
+            List<String> stringList = new LinkedList<>(hrefsList);
             List<NewTask> taskList = new LinkedList<>();
-            NewTask task1 = new NewTask(page, first);
-            taskList.add(task1);
-            NewTask task2 = new NewTask(page, second);
-            taskList.add(task2);
+            int newLength = hrefsList.size();
+            while (true) {
+                if (newLength > THRESHOLD) {
+                    for (int i = 0; i < THRESHOLD; i++) {
+                        stringSetSmallerSize.add(stringList.remove(0));
+                    }
+                    taskList.add(new NewTask(parser, stringSetSmallerSize));
+                    newLength -= THRESHOLD;
+                } else {
+                    for (int i = 0; i < newLength; i++) {
+                        stringSetSmallerSize.add(stringList.remove(0));
+                    }
+                    taskList.add(new NewTask(parser, stringSetSmallerSize));
+                    break;
+                }
+            }
             for (NewTask task : taskList) {
                 task.fork();
             }
@@ -53,7 +51,7 @@ public class NewTask extends RecursiveTask<Set<String>> {
     public Set<String> getHrefsOfHrefs(Set<String> hrefs) {
         Set<String> setOfEachHref = new HashSet<>();
         for (String href : hrefs) {
-            page.getHrefsOnPage(href).forEach(line -> setOfEachHref.add(line));
+            parser.getHrefsOnPage(href).forEach(line -> setOfEachHref.add(line));
         }
         return setOfEachHref;
     }

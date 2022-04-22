@@ -8,7 +8,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "page")
-public class DaoPage {
+public class Page {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -17,15 +17,15 @@ public class DaoPage {
 
     private int code;
 
-    @Type(type = "org.hibernate.type.TextType")
+    //@Type(type = "org.hibernate.type.TextType")
     private String content;
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "page", cascade = CascadeType.ALL)
-    private List<DaoIndex> indexes = new ArrayList<>();
+    private List<Index> indexes = new ArrayList<>();
 
-    public DaoPage() {
+    public Page() {
     }
 
-    public List<DaoIndex> getIndexes() {
+    public List<Index> getIndexes() {
         return indexes;
     }
 

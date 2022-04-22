@@ -1,8 +1,7 @@
-
-import daoClasses.DaoField;
-import daoClasses.DaoIndex;
-import daoClasses.DaoLemma;
-import daoClasses.DaoPage;
+import daoClasses.Field;
+import daoClasses.Index;
+import daoClasses.Lemma;
+import daoClasses.Page;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -21,74 +20,74 @@ public class Connector {
     private Session session = sessionFactory.openSession();
 
 
-    public void addPage(DaoPage page) {
-        Transaction tx = session.beginTransaction();
-        DaoPage daoPage = new DaoPage();
+    public void addPage(Page page) {
+        //Transaction tx = session.beginTransaction();
+        Page daoPage = new Page();
         daoPage.setPath(page.getPath());
         daoPage.setCode(page.getCode());
         daoPage.setContent(page.getContent());
-        List list = session.createQuery("from DaoPage where path = :path").setParameter("path", page.getPath()).list();
+        List list = session.createQuery("from Page where path = :path").setParameter("path", page.getPath()).list();
         if (list.isEmpty()) {
             session.saveOrUpdate(daoPage);
         }
-        tx.commit();
+        //tx.commit();
     }
 
     public void saveLemma(String lemma) {
-        DaoLemma daoLemma = new DaoLemma();
-        List list = session.createQuery("select frequency from DaoLemma where lemma = :lemma")
+        Lemma daoLemma = new Lemma();
+        List list = session.createQuery("select frequency from Lemma where lemma = :lemma")
                 .setParameter("lemma", lemma)
                 .getResultList();
-        Transaction tx = session.beginTransaction();
+
         if (!list.isEmpty()) {
+            Transaction tx = session.beginTransaction();
             int fr = (int)list.get(0);
-            session.createQuery("update DaoLemma set frequency = :newFrequency where lemma = :lemma")
+            session.createQuery("update Lemma set frequency = :newFrequency where lemma = :lemma")
                     .setParameter("lemma", lemma)
                     .setParameter("newFrequency", ++fr)
                     .executeUpdate();
-
+            tx.commit();
         } else {
             daoLemma.setFrequency(1);
             daoLemma.setLemma(lemma);
             session.save(daoLemma);
         }
-        tx.commit();
+
     }
 
-    public DaoLemma getLemma(String lemma) {
-        List list = session.createQuery("from DaoLemma where lemma = :lemma")
+    public Lemma getLemma(String lemma) {
+        List list = session.createQuery("from Lemma where lemma = :lemma")
                 .setParameter("lemma", lemma).getResultList();
-        DaoLemma daoLemma = (DaoLemma) list.get(0);
+        Lemma daoLemma = (Lemma) list.get(0);
         return daoLemma;
     }
 
-    public DaoPage getPage(String path) {
-        List list = session.createQuery("from DaoPage where path = :path")
+    public Page getPage(String path) {
+        List list = session.createQuery("from Page where path = :path")
                 .setParameter("path", path).getResultList();
-        DaoPage daoPage = (DaoPage) list.get(0);
-        return daoPage;
+        Page page = (Page) list.get(0);
+        return page;
     }
 
-
-    public void addIndexes(DaoPage page, DaoLemma lemma, Float rank) {
-        DaoIndex daoIndex = new DaoIndex();
-        daoIndex.setPage(page);
-        daoIndex.setLemma(lemma);
-        daoIndex.setRank(rank);
-        session.save(daoIndex);
+    public void addIndexes(Page page, Lemma lemma, Float rank) {
+        Index index = new Index();
+        index.setPage(page);
+        index.setLemma(lemma);
+        index.setRank(rank);
+        session.save(index);
     }
 
     public List<String> getAllPaths() {
         List daoPageSet;
-        daoPageSet = session.createQuery("select path from DaoPage").getResultList();
+        daoPageSet = session.createQuery("select path from Page").getResultList();
         return daoPageSet;
     }
 
     public Map<String, Float> getSelectorFields() {
         Map<String, Float> fieldsMap = new HashMap<>();
-        List<DaoField> fields = session.createQuery("from DaoField").getResultList();
+        List<Field> fields = session.createQuery("from Field").getResultList();
 
-        for(DaoField field : fields) {
+        for(Field field : fields) {
             fieldsMap.put(field.getSelector(), field.getWeight());
         }
         return fieldsMap;

@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "field")
-public class DaoField {
+public class Field {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,7 +13,7 @@ public class DaoField {
     private String selector;
     private float weight;
 
-    public DaoField() {}
+    public Field() {}
 
     public int getId() {
         return id;

@@ -3,9 +3,11 @@ import java.util.*;
 
 import org.apache.lucene.morphology.LuceneMorphology;
 import org.apache.lucene.morphology.russian.RussianLuceneMorphology;
+import org.jsoup.Jsoup;
+import org.jsoup.select.Elements;
 
 
-public class Morph {
+public class Indexes {
 //    public static void main(String[] args) {
 //        String test = "как бы-тур И. К. Лол";
 //        List<String> testList = getCorrectRussianText(test);//.forEach(System.out::println);
@@ -87,5 +89,35 @@ public class Morph {
             }
         }
         return resultMap;
+    }
+
+    private static Map<String, Float> getRank(String text, float weight) {
+        Map<String, Float> wr = new Hashtable<>();
+        Map<String, Integer> tempMap = getMorphMap(text);
+        for(var line : tempMap.entrySet()) {
+            wr.put(line.getKey(), line.getValue() * weight);
+        }
+        return wr;
+    }
+
+    public static Map<String, Float> rankMap(String content, Map<String, Float> indexes) {
+        Elements page = Jsoup.parse(content).getAllElements();
+        Map<String, Float> indexMap = new Hashtable<>(indexes);
+        Map<String, Float> rankMap = new TreeMap<>();
+        indexMap.forEach((selector,weight) -> {
+            String text = page.select(selector).text();
+            Map<String, Float> ranks = getRank(text, weight);
+            for (Map.Entry<String, Float> lineOfMap : ranks.entrySet()) {
+                String word = lineOfMap.getKey();
+                Float rank = lineOfMap.getValue();
+                if (!rankMap.containsKey(word)) {
+                    rankMap.put(word, rank);
+                } else {
+                    Float tempRank = rankMap.remove(word);
+                    rankMap.put(word, rank + tempRank);
+                }
+            }
+        });
+        return rankMap;
     }
 }

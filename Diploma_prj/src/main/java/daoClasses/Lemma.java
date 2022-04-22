@@ -5,25 +5,25 @@ import java.util.*;
 
 @Entity
 @Table(name = "lemma")
-public class DaoLemma {
+public class Lemma {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String lemma;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "lemma", cascade = CascadeType.ALL)
-    private List<DaoIndex> indexes = new ArrayList<>();
+    private List<Index> indexes = new ArrayList<>();
 
     private int frequency;
 
-    public DaoLemma() {
+    public Lemma() {
     }
 
-    public List<DaoIndex> getIndexes() {
+    public List<Index> getIndexes() {
         return indexes;
     }
 
-    public void setIndexes(List<DaoIndex> indexes) {
+    public void setIndexes(List<Index> indexes) {
         this.indexes = indexes;
     }
 
