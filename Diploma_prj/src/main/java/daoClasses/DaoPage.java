@@ -12,7 +12,7 @@ public class DaoPage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    //@Type(type = "org.hibernate.type.TextType")
+
     private String path;
 
     private int code;
@@ -21,12 +21,6 @@ public class DaoPage {
     private String content;
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "page", cascade = CascadeType.ALL)
     private List<DaoIndex> indexes = new ArrayList<>();
-
-    public DaoPage(String path, int code, String content) {
-        this.path = path;
-        this.code = code;
-        this.content = content;
-    }
 
     public DaoPage() {
     }
