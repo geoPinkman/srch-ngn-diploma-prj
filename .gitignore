@@ -24,4 +24,4 @@ hs_err_pid*
 # IDE configurations
 *.idea/
 /.DS_Store
-/target
+target/
