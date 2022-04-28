@@ -11,6 +11,7 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Connector {
 
@@ -83,10 +84,48 @@ public class Connector {
         return daoPageSet;
     }
 
+    public long getPathCount() {
+        return (Long) session.createQuery("select count(id) from Page as pageCount").uniqueResult();
+    }
+
+    public Map<String, Integer> getMorphsFromDB(String queryString) {
+        Map<String, Integer> result = new HashMap<>();
+        Set<String> uniqMorphs = Indexes.getMorphMap(queryString).keySet();
+        int pageCount = (int) getPathCount();
+        System.out.println(pageCount);
+        for (String morph : uniqMorphs) {
+            Integer freq = (Integer) session.createQuery("select frequency from Lemma where lemma = :morph")
+                    .setParameter("morph", morph)
+                    .uniqueResult();
+            if (freq != null) {
+                double frq = freq / (pageCount * 1.0);
+                if (frq <= 0.5) {
+                    result.put(morph, freq);
+                }
+            }
+        }
+        Map<String, Integer> sortedResultByValue = result
+                .entrySet()
+                .stream()
+                .sorted(Comparator.comparingInt(e -> e.getValue()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> { throw new AssertionError(); },
+                        LinkedHashMap::new
+                ));
+        return sortedResultByValue;
+    }
+
+    public void testM(String lemma) {
+        List list = session.createQuery("select id from Lemma where lemma = :lemma")
+                .setParameter("lemma", lemma).getResultList();
+        list.forEach(System.out::println);
+    }
+
     public Map<String, Float> getSelectorFields() {
         Map<String, Float> fieldsMap = new HashMap<>();
         List<Field> fields = session.createQuery("from Field").getResultList();
-
         for(Field field : fields) {
             fieldsMap.put(field.getSelector(), field.getWeight());
         }
@@ -101,11 +140,24 @@ public class Connector {
     public Session getSession() {
         return session;
     }
+
     public static void main(String[] args) {
         Connector connector = new Connector();
-        Session test = connector.getSession();
+        //System.out.println(connector.getPathCount());
+//        connector
+//                .getMorphsFromDB("псы войны искали абонемент в библиотеку и когда не нашли, ушли  в гости")
+//                .forEach((l,p) -> System.out.println(l + " - " + p));
+        //connector.testM("услать");
+        connector.testM("наслать");
+        connector.testM("уйти");
+        connector.testM("гостить");
+        connector.testM("искать");
+        connector.testM("война");
+        connector.testM("гость");
+
 
     }
 
 
 }
+

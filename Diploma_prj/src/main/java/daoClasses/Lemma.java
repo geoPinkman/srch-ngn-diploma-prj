@@ -18,6 +18,11 @@ public class Lemma {
 
     public Lemma() {
     }
+    public Lemma(int id, String lemma, int frequency) {
+        this.id = id;
+        this.lemma = lemma;
+        this.frequency = frequency;
+    }
 
     public List<Index> getIndexes() {
         return indexes;
