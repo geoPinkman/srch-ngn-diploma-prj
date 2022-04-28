@@ -19,6 +19,9 @@ public class Connector {
     private SessionFactory sessionFactory = metadata.getSessionFactoryBuilder().build();
     private Session session = sessionFactory.openSession();
 
+    public Connector () {
+
+    }
 
     public void addPage(Page page) {
         Page daoPage = new Page();
@@ -95,6 +98,14 @@ public class Connector {
         System.out.println("Session closed");
     }
 
+    public Session getSession() {
+        return session;
+    }
+    public static void main(String[] args) {
+        Connector connector = new Connector();
+        Session test = connector.getSession();
+
+    }
 
 
 }

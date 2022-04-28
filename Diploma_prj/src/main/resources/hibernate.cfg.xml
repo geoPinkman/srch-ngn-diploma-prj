@@ -17,6 +17,11 @@
         <property name="current_session_context_class">thread</property>
         <!--  Drop and re-create the database schema on startup  -->
         <property name="hbm2ddl.auto">update</property>
+
+        <property name="hibernate.jdbc.batch_size">50</property>
+        <property name="hibernate.order_inserts">true</property>
+        <property name="hibernate.order_updates">true</property>
+
         <mapping class="daoClasses.Page"/>
         <mapping class="daoClasses.Field"/>
         <mapping class="daoClasses.Lemma"/>

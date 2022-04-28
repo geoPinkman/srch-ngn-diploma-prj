@@ -26,8 +26,8 @@ public class Main {
         }
         parser.getFullSet().addAll(stringSet);
         parser.findNewHrefs(parser.getHrefsOfHrefs(parser.getHrefsOnPage(parser.getUrl())));
-        Set<String> findedHrefs = parser.getFullSet();
-        for (String path : findedHrefs) {
+        Set<String> findHrefs = parser.getFullSet();
+        for (String path : findHrefs) {
             Page page = Parser.getPage(path);
             connector.addPage(page);
             Map<String, Float> rankMapOfLemmasOnPage = Indexes.rankMap(page.getContent(), selectors);
