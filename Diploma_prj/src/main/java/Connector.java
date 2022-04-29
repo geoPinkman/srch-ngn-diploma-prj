@@ -19,6 +19,7 @@ public class Connector {
     private Metadata metadata = new MetadataSources(registry).getMetadataBuilder().build();
     private SessionFactory sessionFactory = metadata.getSessionFactoryBuilder().build();
     private Session session = sessionFactory.openSession();
+    public static Set<String> resultSet = new HashSet<>();
 
     public Connector () {
 
@@ -118,9 +119,9 @@ public class Connector {
     }
 
     public void testM(String lemma) {
-        List list = session.createQuery("select id from Lemma where lemma = :lemma")
+        List<String> list = session.createQuery("select p.path from Page p inner join Index i on p.id = i.page.id inner join Lemma l on i.lemma.id = l.id where l.lemma = :lemma")
                 .setParameter("lemma", lemma).getResultList();
-        list.forEach(System.out::println);
+        resultSet.addAll(list);
     }
 
     public Map<String, Float> getSelectorFields() {
@@ -155,6 +156,7 @@ public class Connector {
         connector.testM("война");
         connector.testM("гость");
 
+        resultSet.forEach(System.out::println);
 
     }
 
