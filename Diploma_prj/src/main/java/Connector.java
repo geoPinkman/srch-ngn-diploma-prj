@@ -25,6 +25,24 @@ public class Connector {
 
     }
 
+    public void closeSession() {
+        session.close();
+        System.out.println("Session closed");
+    }
+
+    public Session getSession() {
+        return session;
+    }
+
+    public Map<String, Float> getSelectorFields() {
+        Map<String, Float> fieldsMap = new HashMap<>();
+        List<Field> fields = session.createQuery("from Field").getResultList();
+        for(Field field : fields) {
+            fieldsMap.put(field.getSelector(), field.getWeight());
+        }
+        return fieldsMap;
+    }
+
     public void addPage(Page page) {
         Page daoPage = new Page();
         daoPage.setPath(page.getPath());
@@ -67,8 +85,7 @@ public class Connector {
     public Page getPage(String path) {
         List list = session.createQuery("from Page where path = :path")
                 .setParameter("path", path).getResultList();
-        Page page = (Page) list.get(0);
-        return page;
+        return (Page) list.get(0);
     }
 
     public void addIndexes(Page page, Lemma lemma, Float rank) {
@@ -93,14 +110,13 @@ public class Connector {
         Map<String, Integer> result = new HashMap<>();
         Set<String> uniqMorphs = Indexes.getMorphMap(queryString).keySet();
         int pageCount = (int) getPathCount();
-        System.out.println(pageCount);
         for (String morph : uniqMorphs) {
             Integer freq = (Integer) session.createQuery("select frequency from Lemma where lemma = :morph")
                     .setParameter("morph", morph)
                     .uniqueResult();
             if (freq != null) {
                 double frq = freq / (pageCount * 1.0);
-                if (frq <= 0.5) {
+                if (frq <= 0.7) {
                     result.put(morph, freq);
                 }
             }
@@ -108,7 +124,7 @@ public class Connector {
         Map<String, Integer> sortedResultByValue = result
                 .entrySet()
                 .stream()
-                .sorted(Comparator.comparingInt(e -> e.getValue()))
+                .sorted(Comparator.comparingInt(Map.Entry::getValue))
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,
@@ -118,45 +134,33 @@ public class Connector {
         return sortedResultByValue;
     }
 
-    public void testM(String lemma) {
+    public List<String> getPathListByLemma(String lemma) {
         List<String> list = session.createQuery("select p.path from Page p inner join Index i on p.id = i.page.id inner join Lemma l on i.lemma.id = l.id where l.lemma = :lemma")
                 .setParameter("lemma", lemma).getResultList();
-        resultSet.addAll(list);
+        return list;
     }
 
-    public Map<String, Float> getSelectorFields() {
-        Map<String, Float> fieldsMap = new HashMap<>();
-        List<Field> fields = session.createQuery("from Field").getResultList();
-        for(Field field : fields) {
-            fieldsMap.put(field.getSelector(), field.getWeight());
-        }
-        return fieldsMap;
-    }
-
-    public void closeSession() {
-        session.close();
-        System.out.println("Session closed");
-    }
-
-    public Session getSession() {
-        return session;
+    public void testM(List<String> list) {
+        
     }
 
     public static void main(String[] args) {
         Connector connector = new Connector();
         //System.out.println(connector.getPathCount());
+        String qString = "гости пришли";
+        Indexes.getMorphMap(qString).forEach((l,p)-> System.out.println(l));
+        connector.getMorphsFromDB(qString).forEach((l,p) -> System.out.println(l + " - " + p));
+        connector.getMorphsFromDB(qString).keySet().forEach(l-> connector.getPathListByLemma(l).forEach(System.out::println));
+        System.out.println(qString);
 //        connector
-//                .getMorphsFromDB("псы войны искали абонемент в библиотеку и когда не нашли, ушли  в гости")
-//                .forEach((l,p) -> System.out.println(l + " - " + p));
-        //connector.testM("услать");
-        connector.testM("наслать");
-        connector.testM("уйти");
-        connector.testM("гостить");
-        connector.testM("искать");
-        connector.testM("война");
-        connector.testM("гость");
+//                .getMorphsFromDB(qString)
+//                .forEach((l,p) -> {
+//                    System.out.println(l);
+//                    connector.testM(connector.getPathListByLemma(l));
+//                    System.out.println(p);
+//                });
 
-        resultSet.forEach(System.out::println);
+        //resultSet.forEach(System.out::println);
 
     }
 
